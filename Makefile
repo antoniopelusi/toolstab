@@ -1,4 +1,4 @@
-VERSION := "2.3"
+VERSION := "2.4"
 OUT_DIR := out
 
 .PHONY: firefox chrome clean run

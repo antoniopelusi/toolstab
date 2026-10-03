@@ -1,4 +1,4 @@
-// ─── Utility ────────────────────────────────────────────────────────
+// ─── Utility ──────────────────────────────────────────────────────────────────
 function debounce(fn, delay) {
     let timer;
     return function (...args) {
@@ -22,28 +22,11 @@ const Storage = {
 // ─── DateTime ─────────────────────────────────────────────────────────────────
 class DateTime {
     months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December",
     ];
-    days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
+    days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     constructor() {
         this.use24h = localStorage.getItem("use24h") === "true";
@@ -51,11 +34,6 @@ class DateTime {
 
     updateDateTime() {
         const now = new Date();
-        const day = now.getDate();
-        const month = this.months[now.getMonth()];
-        const year = now.getFullYear();
-        const dayName = this.days[now.getDay()];
-
         let hours = now.getHours();
         const minutes = now.getMinutes().toString().padStart(2, "0");
 
@@ -69,22 +47,19 @@ class DateTime {
         }
 
         const dateEl = document.getElementById("date-display");
-        const dayEl = document.getElementById("day-display");
+        const dayEl  = document.getElementById("day-display");
         const timeEl = document.getElementById("time-display");
 
-        if (dateEl) dateEl.textContent = `${day} ${month} ${year}`;
-        if (dayEl) dayEl.textContent = dayName;
+        if (dateEl) dateEl.textContent = `${now.getDate()} ${this.months[now.getMonth()]} ${now.getFullYear()}`;
+        if (dayEl)  dayEl.textContent  = this.days[now.getDay()];
         if (timeEl) timeEl.textContent = timeString;
     }
 
     init() {
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
-
         window.addEventListener("storage", (e) => {
-            if (e.key === "use24h") {
-                this.use24h = e.newValue === "true";
-            }
+            if (e.key === "use24h") this.use24h = e.newValue === "true";
         });
     }
 }
@@ -92,11 +67,11 @@ class DateTime {
 // ─── TodoList ─────────────────────────────────────────────────────────────────
 class TodoList {
     constructor() {
-        this.todos = Storage.load("todolist", []);
-        this.list = document.getElementById("todo-list");
-        this.input = document.getElementById("todo-input");
+        this.todos    = Storage.load("todolist", []);
+        this.list     = document.getElementById("todo-list");
+        this.input    = document.getElementById("todo-input");
         this.clearBtn = document.getElementById("clear-completed");
-        this.editing = null;
+        this.editing  = null;
     }
 
     save() {
@@ -105,22 +80,17 @@ class TodoList {
 
     addTodo(text) {
         if (!text.trim()) return;
-        this.todos.push({
-            id: Date.now(),
-            text: text.trim(),
-            completed: false,
-        });
+        this.todos.push({ id: Date.now(), text: text.trim(), completed: false });
         this.save();
         this.render();
     }
 
     toggleTodo(id) {
         const todo = this.todos.find((t) => t.id === id);
-        if (todo) {
-            todo.completed = !todo.completed;
-            this.save();
-            this.render();
-        }
+        if (!todo) return;
+        todo.completed = !todo.completed;
+        this.save();
+        this.render();
     }
 
     deleteTodo(id) {
@@ -134,63 +104,63 @@ class TodoList {
         if (todo && newText.trim()) {
             todo.text = newText.trim();
             this.save();
-            this.render();
         }
+        this.editing = null;
+        this.render();
     }
 
     startEdit(li, todo) {
         if (this.editing) return;
         this.editing = todo.id;
 
-        const span = li.querySelector("span");
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = todo.text;
+        const textEl = li.querySelector(".todo-text");
+        const input  = document.createElement("input");
+        input.type   = "text";
+        input.value  = todo.text;
 
-        li.replaceChild(input, span);
+        li.replaceChild(input, textEl);
         input.focus();
         input.setSelectionRange(input.value.length, input.value.length);
 
-        const save = () => {
-            this.editTodo(todo.id, input.value);
-            this.editing = null;
-        };
+        let committed = false;
 
-        const cancel = () => {
-            this.editing = null;
-            this.render();
+        const commit = (action) => {
+            if (committed) return;
+            committed = true;
+            if (action === "save") {
+                this.editTodo(todo.id, input.value);
+            } else {
+                this.editing = null;
+                this.render();
+            }
         };
 
         input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
-                save();
+                commit("save");
             } else if (e.key === "Escape") {
                 e.preventDefault();
-                cancel();
+                commit("cancel");
             } else if (e.key === "Delete") {
                 e.preventDefault();
-                this.deleteTodo(todo.id);
+                committed = true;
                 this.editing = null;
+                this.deleteTodo(todo.id);
             }
         });
-        input.addEventListener("blur", save);
+
+        input.addEventListener("blur", () => commit("save"));
     }
 
     moveTodo(id, direction) {
-        const index = this.todos.findIndex((t) => t.id === id);
-        if (index === -1) return;
+        const i = this.todos.findIndex((t) => t.id === id);
+        if (i === -1) return;
 
-        if (direction === "up" && index > 0) {
-            [this.todos[index - 1], this.todos[index]] = [
-                this.todos[index],
-                this.todos[index - 1],
-            ];
-        } else if (direction === "down" && index < this.todos.length - 1) {
-            [this.todos[index], this.todos[index + 1]] = [
-                this.todos[index + 1],
-                this.todos[index],
-            ];
+        if (direction === "up" && i > 0) {
+            [this.todos[i - 1], this.todos[i]] = [this.todos[i], this.todos[i - 1]];
+        } else if (direction === "down" && i < this.todos.length - 1) {
+            [this.todos[i], this.todos[i + 1]] = [this.todos[i + 1], this.todos[i]];
         } else {
             return;
         }
@@ -207,61 +177,51 @@ class TodoList {
 
         this.todos.forEach((todo, idx) => {
             const li = document.createElement("li");
-            li.className = todo.completed ? "completed" : "";
-            li.style.display = "flex";
-            li.style.alignItems = "flex-start";
+            if (todo.completed) li.classList.add("completed");
 
+            // Bullet — real element so click is reliable (::before is not hittable)
+            const bullet = document.createElement("button");
+            bullet.className = "todo-bullet";
+            bullet.setAttribute("aria-label", todo.completed ? "Mark incomplete" : "Mark complete");
+            bullet.addEventListener("click", (e) => {
+                e.stopPropagation();
+                this.toggleTodo(todo.id);
+            });
+            li.appendChild(bullet);
+
+            // Text span
             const span = document.createElement("span");
+            span.className   = "todo-text";
             span.textContent = todo.text;
-            span.style.marginRight = "auto";
-            span.style.wordWrap = "break-word";
-            span.style.overflowWrap = "break-word";
-            span.style.flex = "1";
-            span.style.minWidth = "0";
             li.appendChild(span);
 
+            // Arrow buttons
             const arrows = document.createElement("div");
-            arrows.style.display = "flex";
-            arrows.style.flexDirection = "column";
-            arrows.style.justifyContent = "center";
-            arrows.style.gap = "0px";
-            arrows.style.height = "auto";
-            arrows.style.marginLeft = "calc(var(--spacing) * 0.3)";
+            arrows.className = "todo-arrows";
 
-            const createArrow = (symbol, disabled) => {
-                const btn = document.createElement("button");
-                btn.textContent = symbol;
-                btn.style.background = "none";
-                btn.style.border = "none";
-                btn.style.padding = "0";
-                btn.style.margin = "0";
-                btn.style.flex = "0";
-                btn.style.height = "auto";
-                btn.style.lineHeight = "1";
-                btn.style.cursor = disabled ? "default" : "pointer";
-                btn.style.opacity = disabled ? "0.3" : "1";
-                btn.style.color = "#ffffff70";
-                btn.style.fontSize = "clamp(14px, 1.7vh, 20px)";
-                return btn;
-            };
-
-            const upArrow = createArrow("▲", idx === 0);
-            const downArrow = createArrow("▼", idx === this.todos.length - 1);
-
-            upArrow.addEventListener("click", (e) => {
+            const upBtn = document.createElement("button");
+            upBtn.textContent = "▲";
+            upBtn.disabled    = idx === 0;
+            upBtn.setAttribute("aria-label", "Move up");
+            upBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (idx !== 0) this.moveTodo(todo.id, "up");
-            });
-            downArrow.addEventListener("click", (e) => {
-                e.stopPropagation();
-                if (idx !== this.todos.length - 1)
-                    this.moveTodo(todo.id, "down");
+                this.moveTodo(todo.id, "up");
             });
 
-            arrows.appendChild(upArrow);
-            arrows.appendChild(downArrow);
+            const downBtn = document.createElement("button");
+            downBtn.textContent = "▼";
+            downBtn.disabled    = idx === this.todos.length - 1;
+            downBtn.setAttribute("aria-label", "Move down");
+            downBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                this.moveTodo(todo.id, "down");
+            });
+
+            arrows.appendChild(upBtn);
+            arrows.appendChild(downBtn);
             li.appendChild(arrows);
 
+            // Alt+Click: edit · Ctrl/Cmd+Click: delete
             li.addEventListener("click", (e) => {
                 if (e.ctrlKey || e.metaKey) {
                     e.preventDefault();
@@ -269,14 +229,6 @@ class TodoList {
                 } else if (e.altKey) {
                     e.preventDefault();
                     this.startEdit(li, todo);
-                } else {
-                    const rect = li.getBoundingClientRect();
-                    const bulletWidth =
-                        parseFloat(getComputedStyle(li, "::before").width) ||
-                        20;
-                    if (e.clientX - rect.left <= bulletWidth + 10) {
-                        this.toggleTodo(todo.id);
-                    }
                 }
             });
 
@@ -303,7 +255,7 @@ class TodoList {
 
         window.addEventListener("storage", (e) => {
             if (e.key === "todolist") {
-                this.todos = JSON.parse(e.newValue || "[]");
+                this.todos = Storage.load("todolist", []);
                 this.render();
             }
         });
@@ -323,12 +275,12 @@ class Clipboard {
     copyToClipboard(text) {
         if (!text) return;
         navigator.clipboard.writeText(text).catch(() => {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
             document.execCommand("copy");
-            document.body.removeChild(textArea);
+            document.body.removeChild(ta);
         });
     }
 
@@ -337,10 +289,12 @@ class Clipboard {
             const slot = document.getElementById(`clip-slot-${i + 1}`);
             if (!slot) continue;
 
-            slot.value = this.slots[i];
-            if (this.slots[i].trim()) slot.classList.add("has-content");
+            slot.value = this.slots[i] ?? "";
+            slot.classList.toggle("has-content", (this.slots[i] ?? "").trim() !== "");
 
-            slot.addEventListener("click", (e) => {
+            const debouncedSave = debounce(() => this.save(), 300);
+
+            slot.addEventListener("mousedown", (e) => {
                 if (e.ctrlKey || e.metaKey) {
                     e.preventDefault();
                     this.slots[i] = "";
@@ -353,17 +307,9 @@ class Clipboard {
                 }
             });
 
-            const debouncedSave = debounce(() => this.save(), 300);
-
             slot.addEventListener("input", () => {
                 this.slots[i] = slot.value;
-
-                if (slot.value.trim()) {
-                    slot.classList.add("has-content");
-                } else {
-                    slot.classList.remove("has-content");
-                }
-
+                slot.classList.toggle("has-content", slot.value.trim() !== "");
                 debouncedSave();
             });
         }
@@ -372,15 +318,12 @@ class Clipboard {
 
         window.addEventListener("storage", (e) => {
             if (e.key === "clipboard") {
-                this.slots = JSON.parse(e.newValue || '["", "", "", "", ""]');
+                this.slots = Storage.load("clipboard", ["", "", "", "", ""]);
                 for (let i = 0; i < 5; i++) {
                     const slot = document.getElementById(`clip-slot-${i + 1}`);
                     if (!slot) continue;
-                    slot.value = this.slots[i];
-                    slot.classList.toggle(
-                        "has-content",
-                        this.slots[i].trim() !== "",
-                    );
+                    slot.value = this.slots[i] ?? "";
+                    slot.classList.toggle("has-content", (this.slots[i] ?? "").trim() !== "");
                 }
             }
         });
@@ -390,22 +333,21 @@ class Clipboard {
 // ─── Bookmarks ────────────────────────────────────────────────────────────────
 class Bookmarks {
     constructor() {
-        this.bookmarks = Storage.load("bookmarks", []);
-        this.grid = document.getElementById("bookmarks-grid");
+        this.bookmarks    = Storage.load("bookmarks", []);
+        this.grid         = document.getElementById("bookmarks-grid");
         this.editingButton = null;
-        this.iconsMap = {};
-        this.iconsLoaded = false;
+        this.iconsMap     = {};
+        this.iconsLoaded  = false;
         this.loadIcons();
     }
 
     loadIcons() {
         fetch("./assets/icons/icons.json")
-            .then((response) => response.json())
+            .then((r) => r.json())
             .then((data) => {
-                this.iconsMap = {};
                 data.forEach((icon) => {
                     this.iconsMap[icon.title.toLowerCase()] = icon;
-                    this.iconsMap[icon.slug.toLowerCase()] = icon;
+                    this.iconsMap[icon.slug.toLowerCase()]  = icon;
                 });
                 this.iconsLoaded = true;
                 this.render();
@@ -413,87 +355,59 @@ class Bookmarks {
     }
 
     getBookmarkIcon(nameOrSlug) {
-        if (!this.iconsLoaded || !this.iconsMap || !nameOrSlug) return null;
+        if (!this.iconsLoaded || !nameOrSlug) return null;
         return this.iconsMap[nameOrSlug.toLowerCase().trim()] || null;
     }
 
     createEmptyButton() {
         const button = document.createElement("div");
-        button.innerHTML = "";
-        button.style.padding = "0";
-        button.style.margin = "0";
-        button.style.boxSizing = "border-box";
-
         button.addEventListener("click", (e) => {
             if (e.altKey) {
                 e.preventDefault();
                 this.startEdit(button);
             }
         });
-
         return button;
     }
 
-    createFilledButton(bookmark, index) {
+    createFilledButton(bookmark) {
         const button = document.createElement("a");
-        button.href = bookmark.url;
-        button.dataset.bookmarkIndex = index;
+        button.href  = bookmark.url;
 
-        const iconData =
-            this.getBookmarkIcon(bookmark.name) ||
-            this.getBookmarkIcon(bookmark.slug);
-        const iconSrc = iconData
-            ? `./assets/icons/simpleicons/${iconData.source}`
-            : "./assets/icons/default.svg";
+        const iconData  = this.getBookmarkIcon(bookmark.name) || this.getBookmarkIcon(bookmark.slug);
+        const iconSrc   = iconData ? `./assets/icons/simpleicons/${iconData.source}` : "./assets/icons/default.svg";
         const iconColor = iconData ? `#${iconData.hex}` : "var(--color-300)";
 
-        button.innerHTML = "";
-
-        const iconContainer = document.createElement("div");
-        iconContainer.style.display = "flex";
-        iconContainer.style.flexDirection = "column";
-        iconContainer.style.alignItems = "center";
-        iconContainer.style.justifyContent = "center";
-        iconContainer.style.width = "100%";
+        const inner = document.createElement("div");
+        inner.className = "bookmark-inner";
 
         fetch(iconSrc)
-            .then((response) => response.text())
+            .then((r) => r.text())
             .then((svgText) => {
-                const div = document.createElement("div");
-                div.innerHTML = svgText;
-                const svg = div.querySelector("svg");
+                const tmp = document.createElement("div");
+                tmp.innerHTML = svgText;
+                const svg = tmp.querySelector("svg");
                 if (svg) {
                     svg.setAttribute("fill", iconColor);
-                    svg.style.display = "block";
-                    svg.style.margin = "0 auto";
-                    iconContainer.appendChild(svg);
+                    inner.appendChild(svg);
                 } else {
-                    const fallbackImg = document.createElement("img");
-                    fallbackImg.src = "./assets/icons/default.svg";
-                    fallbackImg.alt = "icon";
-                    fallbackImg.style.display = "block";
-                    fallbackImg.style.margin = "0 auto";
-                    fallbackImg.style.width =
-                        "calc(var(--font-size-small) * 2)";
-                    fallbackImg.style.height =
-                        "calc(var(--font-size-small) * 2)";
-                    iconContainer.appendChild(fallbackImg);
+                    const img = document.createElement("img");
+                    img.src = "./assets/icons/default.svg";
+                    img.alt = "icon";
+                    inner.appendChild(img);
                 }
                 const span = document.createElement("span");
                 span.textContent = bookmark.name;
-                span.style.display = "block";
-                span.style.textAlign = "center";
-                span.style.marginTop = "4px";
-                iconContainer.appendChild(span);
+                inner.appendChild(span);
             });
 
-        button.appendChild(iconContainer);
+        button.appendChild(inner);
 
         button.addEventListener("click", (e) => {
             if (e.altKey) {
                 e.preventDefault();
                 this.startEdit(button, bookmark);
-            } else if (e.ctrlKey || e.metaKey || e.button === 1) {
+            } else if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
                 window.open(bookmark.url, "_blank");
             }
@@ -513,111 +427,85 @@ class Bookmarks {
         if (this.editingButton) return;
         this.editingButton = button;
 
-        const newButton = button.cloneNode(false);
-        if (newButton.href) newButton.removeAttribute("href");
-        button.parentNode.replaceChild(newButton, button);
-        this.editingButton = newButton;
+        // Replace the button in the DOM with a plain div (no href navigation)
+        const cell = document.createElement("div");
+        button.parentNode.replaceChild(cell, button);
+        this.editingButton = cell;
 
-        newButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
+        cell.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); });
 
         const editDiv = document.createElement("div");
-        editDiv.style.display = "flex";
-        editDiv.style.flexDirection = "column";
-        editDiv.style.alignItems = "center";
-        editDiv.style.justifyContent = "center";
-        editDiv.style.width = "100%";
-        editDiv.style.height = "100%";
-        editDiv.style.boxSizing = "border-box";
-        editDiv.style.padding = "0";
-        editDiv.style.gap = "6px";
+        editDiv.className = "bookmark-edit";
 
         const nameInput = document.createElement("input");
-        nameInput.type = "text";
+        nameInput.type        = "text";
         nameInput.placeholder = "Name";
-        nameInput.value = bookmark ? bookmark.name : "";
+        nameInput.value       = bookmark ? bookmark.name : "";
         nameInput.autocomplete = "off";
-        nameInput.spellcheck = false;
-        nameInput.style.width = "100%";
-        nameInput.style.boxSizing = "border-box";
+        nameInput.spellcheck  = false;
 
         const urlInput = document.createElement("input");
-        urlInput.type = "text";
+        urlInput.type        = "text";
         urlInput.placeholder = "URL";
-        urlInput.value = bookmark ? bookmark.url : "";
+        urlInput.value       = bookmark ? bookmark.url : "";
         urlInput.autocomplete = "off";
-        urlInput.spellcheck = false;
-        urlInput.style.width = "100%";
-        urlInput.style.boxSizing = "border-box";
+        urlInput.spellcheck  = false;
 
         editDiv.appendChild(nameInput);
         editDiv.appendChild(urlInput);
-        newButton.innerHTML = "";
-        newButton.appendChild(editDiv);
+        cell.appendChild(editDiv);
         nameInput.focus();
 
+        let committed = false;
+
         const saveEdit = () => {
+            if (committed) return;
+            committed = true;
             const name = nameInput.value.trim();
-            const url = urlInput.value.trim();
+            const url  = urlInput.value.trim();
             if (name && url) {
                 if (bookmark) {
                     bookmark.name = name;
-                    bookmark.url = url;
+                    bookmark.url  = url;
                 } else {
                     this.bookmarks.push({ name, url });
                 }
-                this.bookmarks.sort((a, b) => a.name.localeCompare(b.name));
                 this.save();
-                this.render();
-            } else {
-                this.cancelEdit();
             }
+            this.editingButton = null;
+            this.render();
         };
 
         const cancelEdit = () => {
-            if (!this.editingButton) return;
-            const btn = this.editingButton;
-            if (btn && btn.dataset.bookmarkIndex !== undefined && bookmark) {
-                const index = parseInt(btn.dataset.bookmarkIndex, 10);
-                const restored = this.createFilledButton(bookmark, index);
-                btn.parentNode.replaceChild(restored, btn);
-            } else {
-                btn.parentNode.replaceChild(this.createEmptyButton(), btn);
-            }
+            if (committed) return;
+            committed = true;
             this.editingButton = null;
+            this.render();
         };
 
         const deleteBookmark = () => {
+            if (committed) return;
+            committed = true;
             if (bookmark) {
                 this.bookmarks = this.bookmarks.filter((b) => b !== bookmark);
                 this.save();
-                this.render();
-            } else {
-                cancelEdit();
             }
+            this.editingButton = null;
+            this.render();
         };
 
         const handleKeydown = (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                saveEdit();
-            } else if (e.key === "Escape") {
-                e.preventDefault();
-                cancelEdit();
-            } else if (e.key === "Delete") {
-                e.preventDefault();
-                deleteBookmark();
-            }
+            if (e.key === "Enter")  { e.preventDefault(); saveEdit(); }
+            else if (e.key === "Escape") { e.preventDefault(); cancelEdit(); }
+            else if (e.key === "Delete") { e.preventDefault(); deleteBookmark(); }
         };
 
         nameInput.addEventListener("keydown", handleKeydown);
-        urlInput.addEventListener("keydown", handleKeydown);
-        nameInput.addEventListener("click", (e) => e.stopPropagation());
-        urlInput.addEventListener("click", (e) => e.stopPropagation());
+        urlInput.addEventListener("keydown",  handleKeydown);
+        nameInput.addEventListener("click",     (e) => e.stopPropagation());
+        urlInput.addEventListener("click",      (e) => e.stopPropagation());
         nameInput.addEventListener("mousedown", (e) => e.stopPropagation());
-        urlInput.addEventListener("mousedown", (e) => e.stopPropagation());
+        urlInput.addEventListener("mousedown",  (e) => e.stopPropagation());
 
         let blurTimeout;
         const handleBlur = () => {
@@ -627,21 +515,7 @@ class Bookmarks {
             }, 100);
         };
         nameInput.addEventListener("blur", handleBlur);
-        urlInput.addEventListener("blur", handleBlur);
-    }
-
-    cancelEdit() {
-        if (!this.editingButton) return;
-        const btn = this.editingButton;
-        const parent = btn.parentNode;
-        if (btn.dataset.bookmarkIndex !== undefined) {
-            const index = parseInt(btn.dataset.bookmarkIndex, 10);
-            const bookmark = this.bookmarks[index];
-            parent.replaceChild(this.createFilledButton(bookmark, index), btn);
-        } else {
-            parent.replaceChild(this.createEmptyButton(), btn);
-        }
-        this.editingButton = null;
+        urlInput.addEventListener("blur",  handleBlur);
     }
 
     save() {
@@ -649,14 +523,12 @@ class Bookmarks {
     }
 
     render() {
-        this.grid.innerHTML = "";
-        this.editingButton = null;
+        this.grid.innerHTML  = "";
+        this.editingButton   = null;
 
         [...this.bookmarks]
             .sort((a, b) => a.name.localeCompare(b.name))
-            .forEach((bookmark, index) => {
-                this.grid.appendChild(this.createFilledButton(bookmark, index));
-            });
+            .forEach((bookmark) => this.grid.appendChild(this.createFilledButton(bookmark)));
 
         this.grid.appendChild(this.createEmptyButton());
     }
@@ -667,7 +539,7 @@ class Bookmarks {
 
         window.addEventListener("storage", (e) => {
             if (e.key === "bookmarks") {
-                this.bookmarks = JSON.parse(e.newValue || "[]");
+                this.bookmarks = Storage.load("bookmarks", []);
                 this.render();
             }
         });
@@ -677,21 +549,19 @@ class Bookmarks {
 // ─── Notepad ──────────────────────────────────────────────────────────────────
 class Notepad {
     constructor() {
-        this.content = JSON.parse(localStorage.getItem("notepad") || '""');
+        this.content  = Storage.load("notepad", "");
         this.textarea = document.getElementById("notepad");
     }
 
     save() {
-        if (this.textarea) {
-            this.content = this.textarea.value;
-            localStorage.setItem("notepad", JSON.stringify(this.content));
-        }
+        if (!this.textarea) return;
+        this.content = this.textarea.value;
+        Storage.save("notepad", this.content);
     }
 
     init() {
         if (!this.textarea) return;
-
-        this.textarea.value = this.content;
+        this.textarea.value = this.content ?? "";
 
         const debouncedSave = debounce(() => this.save(), 300);
         this.textarea.addEventListener("input", debouncedSave);
@@ -700,7 +570,7 @@ class Notepad {
 
         window.addEventListener("storage", (e) => {
             if (e.key === "notepad") {
-                this.content = JSON.parse(e.newValue || '""');
+                this.content = Storage.load("notepad", "");
                 if (this.textarea.value !== this.content) {
                     this.textarea.value = this.content;
                 }
@@ -711,15 +581,14 @@ class Notepad {
 
 // ─── Storage initialisation ───────────────────────────────────────────────────
 function initializeStorage() {
-    if (!localStorage.getItem("dynamicBackground"))
-        Storage.save("dynamicBackground", true);
-    if (!localStorage.getItem("customBackgroundColor"))
-        Storage.save("customBackgroundColor", "");
-    if (!localStorage.getItem("todolist")) Storage.save("todolist", []);
-    if (!localStorage.getItem("bookmarks")) Storage.save("bookmarks", []);
-    if (!localStorage.getItem("clipboard"))
-        Storage.save("clipboard", ["", "", "", "", ""]);
-    if (!localStorage.getItem("notepad")) Storage.save("notepad", "");
+    if (localStorage.getItem("dynamicBackground") === null)
+        localStorage.setItem("dynamicBackground", "true");
+    if (localStorage.getItem("customBackgroundColor") === null)
+        localStorage.setItem("customBackgroundColor", "");
+    if (localStorage.getItem("todolist")  === null) Storage.save("todolist", []);
+    if (localStorage.getItem("bookmarks") === null) Storage.save("bookmarks", []);
+    if (localStorage.getItem("clipboard") === null) Storage.save("clipboard", ["", "", "", "", ""]);
+    if (localStorage.getItem("notepad")   === null) Storage.save("notepad", "");
 }
 
 // ─── Import / Export ──────────────────────────────────────────────────────────
@@ -730,13 +599,10 @@ class ImportExport {
             const key = localStorage.key(i);
             config[key] = localStorage.getItem(key);
         }
-
-        const blob = new Blob([JSON.stringify(config, null, 2)], {
-            type: "application/json",
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: "application/json" });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        a.href     = url;
         a.download = "toolstab.config.json";
         document.body.appendChild(a);
         a.click();
@@ -745,34 +611,29 @@ class ImportExport {
     }
 
     static importConfig() {
-        const input = document.createElement("input");
-        input.type = "file";
+        const input  = document.createElement("input");
+        input.type   = "file";
         input.accept = ".json";
         input.style.display = "none";
 
         input.addEventListener("change", (e) => {
-            if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-
-                reader.onload = (event) => {
-                    try {
-                        const config = JSON.parse(event.target.result);
-                        localStorage.clear();
-                        for (const [key, value] of Object.entries(config)) {
-                            localStorage.setItem(key, value);
-                        }
-                        location.reload();
-                    } catch (error) {
-                        alert(
-                            "Error importing configuration: Invalid JSON file",
-                        );
-                        console.error("Import error:", error);
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                try {
+                    const config = JSON.parse(evt.target.result);
+                    localStorage.clear();
+                    for (const [key, value] of Object.entries(config)) {
+                        localStorage.setItem(key, value);
                     }
-                };
-
-                reader.readAsText(file);
-            }
+                    location.reload();
+                } catch (err) {
+                    alert("Error importing configuration: Invalid JSON file");
+                    console.error("Import error:", err);
+                }
+            };
+            reader.readAsText(file);
         });
 
         document.body.appendChild(input);
@@ -783,7 +644,6 @@ class ImportExport {
     static init() {
         const firstSection = document.querySelector("section:nth-child(1)");
         if (!firstSection) return;
-
         firstSection.addEventListener("click", (e) => {
             if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
@@ -793,15 +653,6 @@ class ImportExport {
                 ImportExport.importConfig();
             }
         });
-
-        firstSection.addEventListener(
-            "mouseenter",
-            () => (firstSection.style.cursor = "pointer"),
-        );
-        firstSection.addEventListener(
-            "mouseleave",
-            () => (firstSection.style.cursor = "default"),
-        );
     }
 }
 
@@ -809,7 +660,6 @@ class ImportExport {
 function main() {
     initializeStorage();
     new DynamicBackground().init();
-
     new DateTime().init();
     new TodoList().init();
     new Bookmarks().init();
@@ -821,7 +671,7 @@ function main() {
         if (
             e.key === "Escape" &&
             (document.activeElement instanceof HTMLInputElement ||
-                document.activeElement instanceof HTMLTextAreaElement)
+             document.activeElement instanceof HTMLTextAreaElement)
         ) {
             document.activeElement.blur();
         }

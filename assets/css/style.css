@@ -22,16 +22,18 @@
     font-display: swap;
 }
 
-:root {
-    --font-size-small: clamp(0.8rem, 1.8vmin, 1rem);
-    --font-size-medium: clamp(0.9rem, 2.2vmin, 1.1rem);
-    --font-size-large: clamp(1.2rem, 2.5vmin, 1.8rem);
-    --spacing: clamp(0.5rem, 4vmin, 2rem);
-    --border-radius: clamp(0.75rem, 2vmin, 1.25rem);
+/* ── Variables ────────────────────────────────────────────────────────────── */
 
-    --color-background: #313039;
-    --color-tile: #00000070;
-    --color-tile-hover: #00000075;
+:root {
+    --font-size-small:  clamp(0.75rem, 1.6vmin, 1rem);
+    --font-size-medium: clamp(0.85rem, 1.9vmin, 1.1rem);
+    --font-size-large:  clamp(1rem,    2.8vmin, 1.8rem);
+    --spacing:          clamp(0.5rem,  2.2vmin, 1.8rem);
+    --border-radius:    clamp(0.6rem,  1.8vmin, 1.2rem);
+
+    --color-background: #323232;
+    --color-tile:       #1f1f1f;
+    --color-tile-hover: #1c1c1c;
     --color-100: #ffffffd0;
     --color-300: #ffffffa0;
     --color-500: #ffffff70;
@@ -39,22 +41,32 @@
     --color-800: #00000010;
     --color-900: #00000020;
 
-    --box-shadow: 0 0 16px rgba(0, 0, 0, 0.15);
+    --box-shadow:       0 0 16px rgba(0, 0, 0, 0.15);
     --box-shadow-hover: 0 0 32px rgba(0, 0, 0, 0.25);
 }
+
+/* ── Reset ────────────────────────────────────────────────────────────────── */
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scrollbar-width: none;
 }
 
-html {
-    height: 100%;
+*::-webkit-scrollbar {
+    display: none;
 }
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 
 body {
-    height: 100dvh;
     font-family:
         "Ubuntu local",
         -apple-system,
@@ -62,16 +74,20 @@ body {
         "Segoe UI",
         Roboto,
         sans-serif;
-    overflow: hidden;
+    background-color: var(--color-background);
+    transition: background 8s ease;
 }
 
-* {
-    scrollbar-width: none;
+/* Interactive text in sections uses monospace; headings revert to sans */
+section * {
+    font-family: "Ubuntu Mono local", monospace;
 }
 
-*::-webkit-scrollbar {
-    display: none;
+section h2 {
+    font-family: "Ubuntu local", sans-serif;
 }
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
 
 main {
     height: 100dvh;
@@ -88,6 +104,9 @@ section {
     padding: calc(var(--spacing) * 0.75);
     box-shadow: var(--box-shadow);
     overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 section:hover {
@@ -95,336 +114,294 @@ section:hover {
     box-shadow: var(--box-shadow-hover);
 }
 
-section:nth-child(1) {
-    grid-row: 1;
-    grid-column: 1 / 13;
+section:nth-child(1) { grid-row: 1; grid-column: 1 / 13;  }
+section:nth-child(2) { grid-row: 1; grid-column: 13 / 21; }
+section:nth-child(3) { grid-row: 2; grid-column: 1 / 8;   }
+section:nth-child(4) { grid-row: 2; grid-column: 8 / 13;  }
+section:nth-child(5) { grid-row: 2; grid-column: 13 / 21; }
+
+/* ── Shared section heading (sections 2–5) ───────────────────────────────── */
+
+section:nth-child(n+2) h2 {
+    font-size: var(--font-size-medium);
+    font-weight: 700;
+    color: var(--color-100);
+    text-align: center;
+    margin-bottom: calc(var(--spacing) * 0.5);
+    flex-shrink: 0;
 }
 
-section:nth-child(2) {
-    grid-row: 1;
-    grid-column: 13 / 21;
-}
-
-section:nth-child(3) {
-    grid-row: 2;
-    grid-column: 1 / 8;
-}
-
-section:nth-child(4) {
-    grid-row: 2;
-    grid-column: 8 / 13;
-}
-
-section:nth-child(5) {
-    grid-row: 2;
-    grid-column: 13 / 21;
-}
+/* ── Section 1: Date / Time ───────────────────────────────────────────────── */
 
 section:nth-child(1) {
     display: flex;
     flex-direction: row;
+    align-items: stretch;
     justify-content: space-between;
     color: var(--color-100);
-    position: relative;
-}
-
-section:nth-child(1):hover::after {
-    content: "Ctrl+Click: Export • Alt+Click: Import";
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--color-tile);
-    color: var(--color-300);
-    padding: calc(var(--spacing) * 0.25) calc(var(--spacing) * 0.5);
-    border-radius: calc(var(--border-radius) * 0.5);
-    font-size: calc(var(--font-size-small) * 0.8);
-    white-space: nowrap;
-    z-index: 1000;
-    pointer-events: none;
-    opacity: 0;
-}
-
-section:nth-child(1) > div {
-    height: 100%;
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    z-index: 2;
-}
-
-section:nth-child(1) > div > div:first-child {
-    align-self: flex-start;
-}
-
-section:nth-child(1) > div > div:last-child {
-    align-self: flex-start;
-}
-
-section:nth-child(1) div[id="date-display"],
-section:nth-child(1) div[id="day-display"],
-section:nth-child(1) div[id="time-display"] {
-    font-size: var(--font-size-large);
-    font-family: "Ubuntu local", sans-serif;
-    font-weight: 700;
-    line-height: 1.5;
-}
-
-section:nth-child(1) div[id="day-display"] {
-    font-weight: 400;
-}
-
-section * {
-    font-family: "Ubuntu Mono local", monospace;
-}
-
-section h2 {
-    font-family: "Ubuntu local", sans-serif;
+    cursor: pointer;
 }
 
 section:nth-child(1) * {
     font-family: "Ubuntu local", sans-serif;
 }
 
-section:nth-child(n + 3) h2 {
-    font-size: var(--font-size-medium);
-    font-weight: 700;
-    color: var(--color-100);
-    text-align: center;
-    margin: 0;
+section:nth-child(1) > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
+
+section:nth-child(1) > div:first-child { align-items: flex-start; }
+section:nth-child(1) > div:last-child  { align-items: flex-end; justify-content: flex-end; }
+
+#date-display,
+#day-display,
+#time-display {
+    font-size: var(--font-size-large);
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+#day-display {
+    font-weight: 400;
+}
+
+/* ── Section 2: To-Do ────────────────────────────────────────────────────── */
 
 section:nth-child(2) {
     display: flex;
     flex-direction: column;
-    height: 100%;
     position: relative;
-    overflow: hidden;
 }
 
-section:nth-child(2) img {
+/* Clear-completed icon */
+section:nth-child(2) img#clear-completed {
     position: absolute;
     top: calc(var(--spacing) * 0.75);
     right: calc(var(--spacing) * 0.75);
-    width: calc(var(--font-size-medium) * 1);
-    height: calc(var(--font-size-medium) * 1);
+    width: var(--font-size-medium);
+    height: var(--font-size-medium);
     cursor: pointer;
     opacity: 0.4;
     z-index: 10;
+    transition: opacity 0.15s ease;
 }
 
-section:nth-child(2) img:hover {
+section:nth-child(2) img#clear-completed:hover {
     opacity: 0.8;
 }
 
-section:nth-child(2) h2 {
-    text-align: center;
-    margin-bottom: calc(var(--spacing) * 0.5);
-    font-size: var(--font-size-medium);
-    font-weight: 700;
-    color: var(--color-100);
-    margin: 0 0 calc(var(--spacing) * 0.5) 0;
-}
-
+/* Task list */
 section:nth-child(2) ul {
     flex: 1;
     list-style: none;
-    margin: 0;
-    padding: 0;
     overflow-y: auto;
-    margin-bottom: calc(var(--spacing) * 0.5);
     min-height: 0;
+    padding: calc(var(--spacing) * 0.1) calc(var(--spacing) * 0.4);
+    margin-bottom: calc(var(--spacing) * 0.5);
 }
 
 section:nth-child(2) li {
     display: flex;
     align-items: flex-start;
+    gap: calc(var(--spacing) * 0.4);
     margin-bottom: calc(var(--spacing) * 0.2);
-    cursor: pointer;
-    position: relative;
-    margin-right: 10px;
 }
 
-section:nth-child(2) li::before {
-    content: "";
-    width: calc(var(--font-size-small) * 1);
-    height: calc(var(--font-size-small) * 1);
+/* Bullet: real element for reliable click targeting */
+section:nth-child(2) li .todo-bullet {
+    flex-shrink: 0;
+    width: var(--font-size-small);
+    height: var(--font-size-small);
+    margin-top: calc(var(--font-size-small) * 0.2);
     border-radius: 50%;
     background-color: var(--color-700);
-    margin-right: calc(var(--spacing) * 0.5);
-    margin-top: calc(var(--font-size-small) * 0.25);
-    flex-shrink: 0;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: block;
 }
 
-section:nth-child(2) li.completed::before {
+section:nth-child(2) li.completed .todo-bullet {
     background-color: var(--color-500);
 }
 
-section:nth-child(2) li span {
+section:nth-child(2) li .todo-text {
+    flex: 1;
+    min-width: 0;
     color: var(--color-300);
     font-size: var(--font-size-small);
     line-height: 1.4;
+    word-break: break-word;
 }
 
-section:nth-child(2) li.completed span {
+section:nth-child(2) li.completed .todo-text {
     text-decoration: line-through;
     opacity: 0.6;
 }
 
-section:nth-child(2) input[type="text"]#todo-input {
+/* Inline edit input */
+section:nth-child(2) li input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: var(--color-100);
+    font-size: var(--font-size-small);
+    font-family: "Ubuntu Mono local", monospace;
+    outline: none;
+    line-height: 1.4;
+}
+
+/* Reorder arrows */
+section:nth-child(2) li .todo-arrows {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+section:nth-child(2) li .todo-arrows button {
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+    color: var(--color-500);
+    font-size: calc(var(--font-size-small) * 0.85);
+    cursor: pointer;
+}
+
+section:nth-child(2) li .todo-arrows button:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+/* Add-task input */
+section:nth-child(2) input#todo-input {
+    flex-shrink: 0;
+    width: 100%;
     background-color: var(--color-900);
     border: none;
     border-radius: calc(var(--border-radius) * 0.5);
     padding: calc(var(--spacing) * 0.2);
     color: var(--color-300);
     font-size: var(--font-size-small);
+    font-family: "Ubuntu Mono local", monospace;
     outline: none;
-    width: 100%;
     text-align: center;
-    margin-top: auto;
 }
 
-section:nth-child(2) li input {
-    background: transparent;
-    border: none;
-    color: var(--color-100);
-    font-size: var(--font-size-small);
-    outline: none;
-    width: 100%;
-    line-height: 1.4;
-}
-
-section:nth-child(2) input[type="text"]#todo-input:focus {
-    background-color: var(--color-900);
-}
-
-section:nth-child(2) input[type="text"]#todo-input::placeholder {
+section:nth-child(2) input#todo-input::placeholder {
     color: var(--color-300);
-    opacity: 0.6;
-    font-size: calc(var(--font-size-small) * 0.9);
+    opacity: 0.5;
 }
+
+/* ── Section 3: Bookmarks ─────────────────────────────────────────────────── */
 
 section:nth-child(3) {
     display: flex;
     flex-direction: column;
 }
 
-section:nth-child(3) h2 {
-    margin-bottom: calc(var(--spacing) * 0.5);
-}
-
-section:nth-child(3) > div {
+section:nth-child(3) #bookmarks-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: calc(var(--spacing) * 2.5);
-    gap: calc(var(--spacing) * 0.12);
+    grid-auto-rows: calc(var(--spacing) * 3);
+    gap: calc(var(--spacing) * 0.15);
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     align-content: start;
-    padding: calc(var(--spacing) * 0.08);
 }
 
-section:nth-child(3) > div > div,
-section:nth-child(3) > div > a {
+section:nth-child(3) #bookmarks-grid > div,
+section:nth-child(3) #bookmarks-grid > a {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: transparent;
-    border: none;
+    height: calc(var(--spacing) * 3);
     border-radius: calc(var(--border-radius) * 0.5);
-    cursor: pointer;
-    height: calc(var(--spacing) * 2.5);
-    text-decoration: none;
+    overflow: hidden;
     color: var(--color-300);
-    overflow: hidden;
-}
-
-section:nth-child(3) > div > a {
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    text-align: center;
     text-decoration: none;
+    cursor: pointer;
 }
 
-section:nth-child(3) > div > div:hover,
-section:nth-child(3) > div > a:hover {
+section:nth-child(3) #bookmarks-grid > div:hover,
+section:nth-child(3) #bookmarks-grid > a:hover {
     background-color: var(--color-800);
 }
 
-section:nth-child(3) > div > a div {
+section:nth-child(3) .bookmark-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     height: 100%;
+    gap: calc(var(--spacing) * 0.15);
+    padding: calc(var(--spacing) * 0.15);
 }
 
-section:nth-child(3) > div > a div svg {
-    width: calc(var(--font-size-small) * 1.7);
-    height: calc(var(--font-size-small) * 1.7);
-    margin-bottom: calc(var(--spacing) * 0.25);
+section:nth-child(3) .bookmark-inner svg,
+section:nth-child(3) .bookmark-inner img {
+    width: calc(var(--font-size-small) * 1.6);
+    height: calc(var(--font-size-small) * 1.6);
     flex-shrink: 0;
-    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.1));
+    display: block;
 }
 
-section:nth-child(3) > div > a div img {
-    width: calc(var(--font-size-small) * 2);
-    height: calc(var(--font-size-small) * 2);
-    margin-bottom: calc(var(--spacing) * 0.25);
-    flex-shrink: 0;
-}
-
-section:nth-child(3) > div > a span {
-    font-size: calc(var(--font-size-small) * 0.9);
+section:nth-child(3) .bookmark-inner span {
+    font-size: calc(var(--font-size-small) * 0.85);
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: inline-block;
     max-width: 100%;
-    overflow-wrap: normal;
+    display: block;
+    text-align: center;
 }
 
-section:nth-child(3) div > div {
+/* Edit form inside a bookmark cell */
+section:nth-child(3) .bookmark-edit {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: calc(var(--spacing) * 0.15);
+    justify-content: center;
+    width: 100%;
     height: 100%;
-    padding: calc(var(--spacing) * 0.2);
+    gap: calc(var(--spacing) * 0.2);
+    padding: calc(var(--spacing) * 0.15);
 }
 
-section:nth-child(3) input {
+section:nth-child(3) .bookmark-edit input {
     width: 100%;
-    max-width: 100%;
     min-width: 0;
-    box-sizing: border-box;
     background-color: var(--color-900);
     border: none;
     border-radius: calc(var(--border-radius) * 0.25);
     padding: calc(var(--spacing) * 0.1);
     color: var(--color-300);
-    font-size: calc(var(--font-size-small) * 0.9);
+    font-size: calc(var(--font-size-small) * 0.85);
+    font-family: "Ubuntu Mono local", monospace;
     outline: none;
     text-align: center;
 }
 
-section:nth-child(3) input::placeholder {
+section:nth-child(3) .bookmark-edit input::placeholder {
     color: var(--color-500);
-    opacity: 0.8;
 }
 
-section:nth-child(3) input:focus {
+section:nth-child(3) .bookmark-edit input:focus {
     background-color: var(--color-700);
 }
+
+/* ── Section 4: Clipboard ─────────────────────────────────────────────────── */
 
 section:nth-child(4) {
     display: flex;
     flex-direction: column;
-}
-
-section:nth-child(4) h2 {
-    margin-bottom: calc(var(--spacing) * 0.5);
 }
 
 section:nth-child(4) > div {
@@ -432,21 +409,24 @@ section:nth-child(4) > div {
     flex-direction: column;
     gap: calc(var(--spacing) * 0.25);
     flex: 1;
-    max-height: 100%;
-    overflow-y: auto;
+    min-height: 0;
 }
 
 section:nth-child(4) textarea {
     flex: 1;
+    min-height: 0;
     background-color: transparent;
     border: none;
-    border-bottom: 4px solid transparent;
+    border-bottom: 2px solid transparent;
     border-radius: calc(var(--border-radius) * 0.5);
-    padding: calc(var(--spacing) * 0.3);
+    padding: calc(var(--spacing) * 0.25);
     color: var(--color-300);
     font-size: var(--font-size-small);
+    font-family: "Ubuntu Mono local", monospace;
     outline: none;
     resize: none;
+    line-height: 1.4;
+    transition: background-color 0.15s ease;
 }
 
 section:nth-child(4) textarea.has-content {
@@ -458,23 +438,23 @@ section:nth-child(4) textarea:hover {
     background-color: var(--color-800);
 }
 
+/* ── Section 5: Notepad ───────────────────────────────────────────────────── */
+
 section:nth-child(5) {
     display: flex;
     flex-direction: column;
 }
 
-section:nth-child(5) h2 {
-    margin-bottom: calc(var(--spacing) * 0.5);
-}
-
 section:nth-child(5) textarea {
     flex: 1;
+    min-height: 0;
     background-color: transparent;
     border: none;
     border-radius: calc(var(--border-radius) * 0.5);
-    padding: calc(var(--spacing) * 0.5);
+    padding: calc(var(--spacing) * 0.4);
     color: var(--color-300);
     font-size: var(--font-size-small);
+    font-family: "Ubuntu Mono local", monospace;
     outline: none;
     resize: none;
     line-height: 1.5;

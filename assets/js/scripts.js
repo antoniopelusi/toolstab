@@ -314,7 +314,10 @@ class Clipboard {
             });
         }
 
-        window.addEventListener("beforeunload", () => this.save());
+        window.addEventListener("beforeunload", () => {
+            if (localStorage.getItem("importing") === "true") return;
+            this.save();
+        });
 
         window.addEventListener("storage", (e) => {
             if (e.key === "clipboard") {
@@ -601,7 +604,10 @@ class Notepad {
         const debouncedSave = debounce(() => this.save(), 300);
         this.textarea.addEventListener("input", debouncedSave);
 
-        window.addEventListener("beforeunload", () => this.save());
+        window.addEventListener("beforeunload", () => {
+            if (localStorage.getItem("importing") === "true") return;
+            this.save();
+        });
 
         window.addEventListener("storage", (e) => {
             if (e.key === "notepad") {
@@ -616,6 +622,7 @@ class Notepad {
 
 // ─── Storage initialisation ───────────────────────────────────────────────────
 async function initializeStorage() {
+    localStorage.removeItem("importing");
     const isFirstRun = localStorage.getItem("initialized") === null;
 
     if (isFirstRun) {
@@ -679,6 +686,8 @@ class ImportExport {
                     for (const [key, value] of Object.entries(config)) {
                         localStorage.setItem(key, value);
                     }
+                    localStorage.setItem("initialized", "true");
+                    localStorage.setItem("importing", "true");
                     location.reload();
                 } catch (err) {
                     alert("Error importing configuration: Invalid JSON file");

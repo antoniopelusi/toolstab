@@ -1,14 +1,11 @@
-VERSION := "2.4"
+VERSION := "2.5"
 OUT_DIR := out
 
-.PHONY: firefox chrome clean run
+.PHONY: firefox chrome clean run geticons
 
-.SILENT: firefox chrome clean run
+.SILENT: firefox chrome clean run geticons
 
 all: firefox chrome
-
-geticons:
-	python3 utils/geticons.py
 
 firefox:
 	cp firefox_manifest.json manifest.json
@@ -43,3 +40,6 @@ run:
 	@echo "Network access: http://$$(hostname -I | awk '{print $$1}'):8000"
 	@echo ""
 	python3 -m http.server --bind 0.0.0.0
+
+geticons:
+	python3 utils/geticons.py

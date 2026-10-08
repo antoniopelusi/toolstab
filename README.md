@@ -18,18 +18,20 @@ Package for manual installation available at the [release page](https://github.c
 
 - **Day/Time**: visualize day and time
 - **Todo list**: manage tasks:
-	- `Alt+click` on a todo list item: add/edit a bookmark:
-    - When editing a todo list item, press `Enter` or click somewhere else to save it
-    - When editing a todo list item, press `Escape` to abort the operation
-    - When editing a todo list item, press `Delete` to delete it
+  - `Alt+click` on a todo list item: edit it
+    - Press `Enter` or click somewhere else to save
+    - Press `Escape` to abort
+    - Press `Delete` to delete the item
   - `Ctrl+click` on a todo list item: delete it
-- **Bookmarks**: 15 ordered bookmark slots:
+  - `▲` / `▼` arrow buttons: reorder items
+- **Bookmarks**: ordered bookmark slots:
   - `Alt+click` on a bookmark: add/edit a bookmark:
-    - _name_: choose a service name (or one of the slug names from [`slugs.mg`](utils/slugs.md)) to automatically use the corresponding icon
-    - _link_: the URL of the bookmark
-    - When editing a bookmark, press `Enter` or click somewhere else to save it
-    - When editing a bookmark, press `Escape` to abort the operation
-    - When editing a bookmark, press `Delete` to delete it
+    - _name_: choose a service name to automatically use the corresponding icon
+    - _icon_ (optional): secondary icon name tried if _name_ does not match any icon (e.g. set name `ChatGPT` and icon `openai`)
+    - _url_: the URL of the bookmark
+    - Press `Enter` or click somewhere else to save
+    - Press `Escape` to abort
+    - Press `Delete` to delete the bookmark
   - `click` on a bookmark: open the link in this tab
   - `Ctrl+click` on a bookmark: open the link in a new tab
 - **Clipboard**: 5 slots for copying and pasting texts
@@ -42,12 +44,6 @@ Package for manual installation available at the [release page](https://github.c
 	- `Ctrl+click` on the day/time tile: export the configuration to a file
   - `Alt+click` on the day/time tile: import a configuration from a file
 
-## Screenshots
+## Screenshot
 
-![](assets/screenshots/06AM.png)
-![](assets/screenshots/09AM.png)
-![](assets/screenshots/12PM.png)
-![](assets/screenshots/02PM.png)
-![](assets/screenshots/05PM.png)
-![](assets/screenshots/07PM.png)
-![](assets/screenshots/12AM.png)
+![](assets/screenshots/screenshot.png)

@@ -359,6 +359,20 @@ class Bookmarks {
         return this.iconsMap[nameOrSlug.toLowerCase().trim()] || null;
     }
 
+    contrastSafe(hex) {
+        // Perceived luminance (0–255). If too dark, return white instead.
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+        return luminance < 40 ? "cccccc" : hex;
+    }
+
+    resolveIcon(bookmark) {
+        return this.getBookmarkIcon(bookmark.name)
+            || (bookmark.icon ? this.getBookmarkIcon(bookmark.icon) : null);
+    }
+
     createEmptyButton() {
         const button = document.createElement("div");
         button.addEventListener("click", (e) => {
@@ -374,9 +388,9 @@ class Bookmarks {
         const button = document.createElement("a");
         button.href  = bookmark.url;
 
-        const iconData  = this.getBookmarkIcon(bookmark.name) || this.getBookmarkIcon(bookmark.slug);
+        const iconData  = this.resolveIcon(bookmark);
         const iconSrc   = iconData ? `./assets/icons/simpleicons/${iconData.source}` : "./assets/icons/default.svg";
-        const iconColor = iconData ? `#${iconData.hex}` : "var(--color-300)";
+        const iconColor = iconData ? `#${this.contrastSafe(iconData.hex)}` : "#999999";
 
         const inner = document.createElement("div");
         inner.className = "bookmark-inner";
@@ -397,7 +411,12 @@ class Bookmarks {
                     inner.appendChild(img);
                 }
                 const span = document.createElement("span");
-                span.textContent = bookmark.name;
+                if (bookmark.name.startsWith("• ")) {
+                    span.textContent = bookmark.name.slice(2);
+                    span.style.textDecoration = "underline";
+                } else {
+                    span.textContent = bookmark.name;
+                }
                 inner.appendChild(span);
             });
 
@@ -444,6 +463,13 @@ class Bookmarks {
         nameInput.autocomplete = "off";
         nameInput.spellcheck  = false;
 
+        const iconInput = document.createElement("input");
+        iconInput.type        = "text";
+        iconInput.placeholder = "Icon (optional)";
+        iconInput.value       = bookmark ? (bookmark.icon || "") : "";
+        iconInput.autocomplete = "off";
+        iconInput.spellcheck  = false;
+
         const urlInput = document.createElement("input");
         urlInput.type        = "text";
         urlInput.placeholder = "URL";
@@ -452,6 +478,7 @@ class Bookmarks {
         urlInput.spellcheck  = false;
 
         editDiv.appendChild(nameInput);
+        editDiv.appendChild(iconInput);
         editDiv.appendChild(urlInput);
         cell.appendChild(editDiv);
         nameInput.focus();
@@ -462,13 +489,17 @@ class Bookmarks {
             if (committed) return;
             committed = true;
             const name = nameInput.value.trim();
+            const icon = iconInput.value.trim();
             const url  = urlInput.value.trim();
             if (name && url) {
                 if (bookmark) {
                     bookmark.name = name;
+                    bookmark.icon = icon || undefined;
                     bookmark.url  = url;
                 } else {
-                    this.bookmarks.push({ name, url });
+                    const entry = { name, url };
+                    if (icon) entry.icon = icon;
+                    this.bookmarks.push(entry);
                 }
                 this.save();
             }
@@ -501,10 +532,13 @@ class Bookmarks {
         };
 
         nameInput.addEventListener("keydown", handleKeydown);
+        iconInput.addEventListener("keydown", handleKeydown);
         urlInput.addEventListener("keydown",  handleKeydown);
         nameInput.addEventListener("click",     (e) => e.stopPropagation());
+        iconInput.addEventListener("click",     (e) => e.stopPropagation());
         urlInput.addEventListener("click",      (e) => e.stopPropagation());
         nameInput.addEventListener("mousedown", (e) => e.stopPropagation());
+        iconInput.addEventListener("mousedown", (e) => e.stopPropagation());
         urlInput.addEventListener("mousedown",  (e) => e.stopPropagation());
 
         let blurTimeout;
@@ -515,6 +549,7 @@ class Bookmarks {
             }, 100);
         };
         nameInput.addEventListener("blur", handleBlur);
+        iconInput.addEventListener("blur", handleBlur);
         urlInput.addEventListener("blur",  handleBlur);
     }
 
@@ -580,7 +615,24 @@ class Notepad {
 }
 
 // ─── Storage initialisation ───────────────────────────────────────────────────
-function initializeStorage() {
+async function initializeStorage() {
+    const isFirstRun = localStorage.getItem("initialized") === null;
+
+    if (isFirstRun) {
+        try {
+            const res = await fetch("./assets/js/default.config.json");
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const config = await res.json();
+            for (const [key, value] of Object.entries(config)) {
+                localStorage.setItem(key, value);
+            }
+            console.log("[ToolsTab] Default config loaded.");
+        } catch (err) {
+            console.warn("[ToolsTab] Default config not loaded:", err);
+        }
+        localStorage.setItem("initialized", "true");
+    }
+
     if (localStorage.getItem("dynamicBackground") === null)
         localStorage.setItem("dynamicBackground", "true");
     if (localStorage.getItem("customBackgroundColor") === null)
@@ -657,8 +709,8 @@ class ImportExport {
 }
 
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
-function main() {
-    initializeStorage();
+async function main() {
+    await initializeStorage();
     new DynamicBackground().init();
     new DateTime().init();
     new TodoList().init();

@@ -10,6 +10,8 @@ class DynamicBackground {
         { hour: 21, color: "#314867" },
     ];
 
+    DEFAULT_BG = "#323232";
+
     // 5 blobs with varying sizes — positions assigned at init
     blobs = [
         { rx: 55, ry: 45, speed: 0.007 },
@@ -19,7 +21,7 @@ class DynamicBackground {
         { rx: 30, ry: 28, speed: 0.009 },
     ];
 
-    getColor() {
+    getBlobColor() {
         const now  = new Date();
         const hour = now.getHours() + now.getMinutes() / 60;
 
@@ -41,12 +43,38 @@ class DynamicBackground {
         ];
     }
 
-    applyGradient(r, g, b) {
-        const bg  = "#323232";
+    getBaseBg() {
+        const custom = localStorage.getItem("customBackgroundColor") ?? "";
+        return /^#[A-Fa-f0-9]{6}$/.test(custom) ? custom : this.DEFAULT_BG;
+    }
+
+    applyTileColors(bg) {
+        const hex2rgb = (hex) => hex.match(/\w\w/g).map((x) => parseInt(x, 16));
+        const [r, g, b] = hex2rgb(bg);
+        // Tile: bg darkened by ~40%, hover: darkened by ~45%
+        const darken = (c, f) => Math.round(c * f).toString(16).padStart(2, "0");
+        const tile      = `#${darken(r, 0.60)}${darken(g, 0.60)}${darken(b, 0.60)}`;
+        const tileHover = `#${darken(r, 0.55)}${darken(g, 0.55)}${darken(b, 0.55)}`;
+        document.documentElement.style.setProperty("--color-tile", tile);
+        document.documentElement.style.setProperty("--color-tile-hover", tileHover);
+        document.documentElement.style.setProperty("--color-background", bg);
+    }
+
+    applyBackground() {
+        const bg      = this.getBaseBg();
+        const enabled = localStorage.getItem("dynamicBackground") === "true";
+
+        this.applyTileColors(bg);
+
+        if (!enabled) {
+            document.body.style.background = bg;
+            return;
+        }
+
+        const [r, g, b] = this.getBlobColor();
         const col = `rgba(${r},${g},${b},0.55)`;
 
         const layers = [
-            // Top fade — softens blobs approaching the top edge
             `linear-gradient(to bottom, ${bg} 0%, transparent 22%)`,
         ];
 
@@ -58,10 +86,6 @@ class DynamicBackground {
 
         layers.push(bg);
         document.body.style.background = layers.join(", ");
-    }
-
-    randomPos() {
-        return { x: Math.random() * 100, y: Math.random() * 100 };
     }
 
     pickNewTarget(blob) {
@@ -80,44 +104,31 @@ class DynamicBackground {
         }
     }
 
-    update() {
-        const enabled = localStorage.getItem("dynamicBackground") === "true";
-        if (!enabled) {
-            document.body.style.removeProperty("background");
-            return;
-        }
-        const [r, g, b] = this.getColor();
-        this.applyGradient(r, g, b);
-    }
-
     init() {
         // Distribute blobs evenly across the screen at startup
         const cols = 3;
         this.blobs.forEach((blob, i) => {
             const col  = i % cols;
             const row  = Math.floor(i / cols);
-            // Cell centers with small jitter so they don't sit on a perfect grid
             blob.x  = (col + 0.5) / cols  * 100 + (Math.random() - 0.5) * 15;
             blob.y  = (row + 0.5) / 2     * 100 + (Math.random() - 0.5) * 15;
             blob.tx = blob.x;
             blob.ty = blob.y;
-            // Immediately pick a random target so each blob starts moving
             this.pickNewTarget(blob);
         });
 
-        this.update();
-        setInterval(() => this.update(), 60000);
+        this.applyBackground();
+        setInterval(() => this.applyBackground(), 60000);
 
         const tick = () => {
             if (localStorage.getItem("dynamicBackground") === "true") {
                 this.stepBlobs();
-                const [r, g, b] = this.getColor();
-                this.applyGradient(r, g, b);
+                this.applyBackground();
             }
             requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
 
-        window.addEventListener("storage", () => this.update());
+        window.addEventListener("storage", () => this.applyBackground());
     }
 }

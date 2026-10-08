@@ -1,19 +1,13 @@
 {
     "manifest_version": 3,
     "name": "ToolsTab",
-    "version": "2.5",
+    "version": "2.6",
     "description": "Minimal and responsive browser startpage with useful tools.",
     "chrome_url_overrides": {
         "newtab": "index.html"
     },
     "chrome_settings_overrides": {
         "homepage": "index.html"
-    },
-    "action": {
-        "default_popup": "extension-popup/popup.html",
-        "default_icon": {
-            "128": "assets/icons/icon.png"
-        }
     },
     "icons": {
         "128": "assets/icons/icon.png"

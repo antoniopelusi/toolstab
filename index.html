@@ -16,8 +16,29 @@
                     <div id="date-display"></div>
                     <div id="day-display"></div>
                 </div>
-                <div>
+                <div id="time-wrapper">
                     <div id="time-display"></div>
+                </div>
+                <div id="config-menu">
+                    <img id="config-trigger" src="./assets/icons/settings.svg" alt="Settings" />
+                    <div id="config-actions">
+                        <div class="config-row">
+                            <label for="setting-dynamic">dynamic bg</label>
+                            <input type="checkbox" id="setting-dynamic" />
+                        </div>
+                        <div class="config-row">
+                            <label for="setting-24h">24h format</label>
+                            <input type="checkbox" id="setting-24h" />
+                        </div>
+                        <div class="config-row">
+                            <input type="text" id="setting-color" placeholder="#323232" maxlength="7" spellcheck="false" autocomplete="off" />
+                            <div id="setting-color-preview"></div>
+                        </div>
+                        <div class="config-row config-row-buttons">
+                            <button id="config-save">save</button>
+                            <button id="config-load">load</button>
+                        </div>
+                    </div>
                 </div>
             </section>
             <section>

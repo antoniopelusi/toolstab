@@ -75,7 +75,7 @@ body {
         Roboto,
         sans-serif;
     background-color: var(--color-background);
-    transition: background 8s ease;
+    transition: none;
 }
 
 /* Interactive text in sections uses monospace; headings revert to sans */
@@ -134,6 +134,7 @@ section:nth-child(n+2) h2 {
 /* ── Section 1: Date / Time ───────────────────────────────────────────────── */
 
 section:nth-child(1) {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -153,7 +154,11 @@ section:nth-child(1) > div {
 }
 
 section:nth-child(1) > div:first-child { align-items: flex-start; }
-section:nth-child(1) > div:last-child  { align-items: flex-end; justify-content: flex-end; }
+
+#time-wrapper {
+    align-items: flex-end;
+    justify-content: flex-end;
+}
 
 #date-display,
 #day-display,
@@ -165,6 +170,157 @@ section:nth-child(1) > div:last-child  { align-items: flex-end; justify-content:
 
 #day-display {
     font-weight: 400;
+}
+
+/* ── Section 1: Config menu ──────────────────────────────────────────────── */
+
+#config-menu {
+    position: absolute;
+    top: calc(var(--spacing) * 0.75);
+    right: calc(var(--spacing) * 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: calc(var(--spacing) * 0.2);
+    z-index: 10;
+}
+
+#config-trigger {
+    width: var(--font-size-medium);
+    height: var(--font-size-medium);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    display: block;
+    flex-shrink: 0;
+}
+
+section:nth-child(1):hover #config-trigger {
+    opacity: 0.4;
+}
+
+#config-menu.open #config-trigger,
+#config-menu:hover #config-trigger {
+    opacity: 0.8;
+}
+
+#config-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: calc(var(--spacing) * 0.25);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.25s ease, opacity 0.2s ease;
+    pointer-events: none;
+}
+
+#config-menu.open #config-actions {
+    max-height: 16rem;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.config-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: calc(var(--spacing) * 0.3);
+    width: 100%;
+}
+
+.config-row label {
+    color: var(--color-300);
+    font-size: calc(var(--font-size-small) * 0.85);
+    font-family: "Ubuntu Mono local", monospace;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.config-row input[type="checkbox"] {
+    appearance: none;
+    flex-shrink: 0;
+    width: 26px;
+    height: 15px;
+    border-radius: 72px;
+    background-color: var(--color-500);
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    border: none;
+    margin: 0;
+}
+
+.config-row input[type="checkbox"]::after {
+    content: "";
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background-color: var(--color-100);
+    top: 2px;
+    left: 2px;
+    transition: left 0.15s ease;
+}
+
+.config-row input[type="checkbox"]:checked {
+    background-color: #555555;
+}
+
+.config-row input[type="checkbox"]:checked::after {
+    left: 13px;
+}
+
+.config-row input[type="text"] {
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-500);
+    color: var(--color-300);
+    font-size: calc(var(--font-size-small) * 0.85);
+    font-family: "Ubuntu Mono local", monospace;
+    width: 5.5rem;
+    padding: 0;
+    outline: none;
+    text-align: right;
+}
+
+.config-row input[type="text"]:focus {
+    border-bottom-color: var(--color-100);
+    color: var(--color-100);
+}
+
+.config-row input[type="text"]::placeholder {
+    color: var(--color-500);
+}
+
+#setting-color-preview {
+    width: calc(var(--font-size-small) * 0.85);
+    height: calc(var(--font-size-small) * 0.85);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-color: transparent;
+    border: 1px solid var(--color-500);
+}
+
+.config-row-buttons {
+    gap: calc(var(--spacing) * 0.5);
+    padding-top: calc(var(--spacing) * 0.1);
+}
+
+#config-actions button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-300);
+    font-size: calc(var(--font-size-small) * 0.85);
+    font-family: "Ubuntu Mono local", monospace;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+#config-actions button:hover {
+    color: var(--color-100);
 }
 
 /* ── Section 2: To-Do ────────────────────────────────────────────────────── */
@@ -183,9 +339,13 @@ section:nth-child(2) img#clear-completed {
     width: var(--font-size-medium);
     height: var(--font-size-medium);
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0;
     z-index: 10;
     transition: opacity 0.15s ease;
+}
+
+section:nth-child(2):hover img#clear-completed {
+    opacity: 0.4;
 }
 
 section:nth-child(2) img#clear-completed:hover {
@@ -331,6 +491,30 @@ section:nth-child(3) #bookmarks-grid > a {
 section:nth-child(3) #bookmarks-grid > div:hover,
 section:nth-child(3) #bookmarks-grid > a:hover {
     background-color: var(--color-800);
+}
+
+.bookmark-empty-icon {
+    width: calc(var(--font-size-small) * 1.2);
+    height: calc(var(--font-size-small) * 1.2);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+}
+
+section:nth-child(3):hover .bookmark-empty {
+    background-color: var(--color-800);
+}
+
+section:nth-child(3):hover .bookmark-empty .bookmark-empty-icon {
+    opacity: 0.2;
+}
+
+section:nth-child(3) .bookmark-empty:hover {
+    background-color: var(--color-900) !important;
+}
+
+section:nth-child(3) .bookmark-empty:hover .bookmark-empty-icon {
+    opacity: 1;
 }
 
 section:nth-child(3) .bookmark-inner {

@@ -59,7 +59,10 @@ class DateTime {
         this.updateDateTime();
         setInterval(() => this.updateDateTime(), 1000);
         window.addEventListener("storage", (e) => {
-            if (e.key === "use24h") this.use24h = e.newValue === "true";
+            if (e.key === "use24h") {
+                this.use24h = e.newValue === "true";
+                this.updateDateTime();
+            }
         });
     }
 }
@@ -378,11 +381,17 @@ class Bookmarks {
 
     createEmptyButton() {
         const button = document.createElement("div");
+        button.className = "bookmark-empty";
+
+        const icon = document.createElement("img");
+        icon.src       = "./assets/icons/plus.svg";
+        icon.alt       = "Add bookmark";
+        icon.className = "bookmark-empty-icon";
+        button.appendChild(icon);
+
         button.addEventListener("click", (e) => {
-            if (e.altKey) {
-                e.preventDefault();
-                this.startEdit(button);
-            }
+            e.preventDefault();
+            this.startEdit(button);
         });
         return button;
     }
@@ -711,7 +720,7 @@ class ImportExport {
         document.body.removeChild(input);
     }
 
-    static init() {
+    static init(dateTime) {
         const firstSection = document.querySelector("section:nth-child(1)");
         if (!firstSection) return;
         firstSection.addEventListener("click", (e) => {
@@ -723,6 +732,79 @@ class ImportExport {
                 ImportExport.importConfig();
             }
         });
+
+        // ── Config menu toggle (click to open, click outside to close) ─────
+        const configMenu    = document.getElementById("config-menu");
+        const configTrigger = document.getElementById("config-trigger");
+
+        configTrigger?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            configMenu.classList.toggle("open");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (configMenu && !configMenu.contains(e.target)) {
+                configMenu.classList.remove("open");
+            }
+        });
+
+        document.getElementById("config-save")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            ImportExport.exportConfig();
+        });
+        document.getElementById("config-load")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            ImportExport.importConfig();
+        });
+
+        // ── Settings controls ──────────────────────────────────────────────
+        const isValidHex = (v) => /^#[A-Fa-f0-9]{6}$/.test(v);
+
+        const dynamicCb  = document.getElementById("setting-dynamic");
+        const timeCb     = document.getElementById("setting-24h");
+        const colorInput = document.getElementById("setting-color");
+        const colorDot   = document.getElementById("setting-color-preview");
+
+        // Load current state
+        if (dynamicCb)  dynamicCb.checked  = localStorage.getItem("dynamicBackground") !== "false";
+        if (timeCb)     timeCb.checked     = localStorage.getItem("use24h") === "true";
+        if (colorInput) {
+            const saved = localStorage.getItem("customBackgroundColor") ?? "";
+            colorInput.value = saved;
+            if (colorDot) colorDot.style.backgroundColor = isValidHex(saved) ? saved : "transparent";
+        }
+
+        dynamicCb?.addEventListener("change", (e) => {
+            e.stopPropagation();
+            localStorage.setItem("dynamicBackground", dynamicCb.checked ? "true" : "false");
+            window.dispatchEvent(new Event("storage"));
+        });
+
+        timeCb?.addEventListener("change", (e) => {
+            e.stopPropagation();
+            localStorage.setItem("use24h", timeCb.checked ? "true" : "false");
+            // Update DateTime instance directly for instant feedback
+            if (dateTime) {
+                dateTime.use24h = timeCb.checked;
+                dateTime.updateDateTime();
+            }
+            window.dispatchEvent(new StorageEvent("storage", { key: "use24h", newValue: timeCb.checked ? "true" : "false" }));
+        });
+
+        colorInput?.addEventListener("click",     (e) => e.stopPropagation());
+        colorInput?.addEventListener("mousedown",  (e) => e.stopPropagation());
+        colorInput?.addEventListener("input", (e) => {
+            e.stopPropagation();
+            const val = colorInput.value.trim();
+            if (val === "" || isValidHex(val)) {
+                colorInput.style.borderBottomColor = "";
+                localStorage.setItem("customBackgroundColor", val);
+                if (colorDot) colorDot.style.backgroundColor = isValidHex(val) ? val : "transparent";
+                window.dispatchEvent(new Event("storage"));
+            } else {
+                colorInput.style.borderBottomColor = "#e74c3c";
+            }
+        });
     }
 }
 
@@ -730,12 +812,13 @@ class ImportExport {
 async function main() {
     await initializeStorage();
     new DynamicBackground().init();
-    new DateTime().init();
+    const dateTime = new DateTime();
+    dateTime.init();
     new TodoList().init();
     new Bookmarks().init();
     new Clipboard().init();
     new Notepad().init();
-    ImportExport.init();
+    ImportExport.init(dateTime);
 
     document.addEventListener("keydown", (e) => {
         if (

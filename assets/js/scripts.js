@@ -623,6 +623,15 @@ class Notepad {
 // ─── Storage initialisation ───────────────────────────────────────────────────
 async function initializeStorage() {
     localStorage.removeItem("importing");
+
+    // Retrocompatibility: if the user already has data, mark as initialized
+    // without loading the default config.
+    if (localStorage.getItem("initialized") === null &&
+        (localStorage.getItem("bookmarks") !== null ||
+         localStorage.getItem("todolist")  !== null)) {
+        localStorage.setItem("initialized", "true");
+    }
+
     const isFirstRun = localStorage.getItem("initialized") === null;
 
     if (isFirstRun) {

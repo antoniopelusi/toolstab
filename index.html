@@ -23,7 +23,7 @@
                     <img id="config-trigger" src="./assets/icons/settings.svg" alt="Settings" />
                     <div id="config-actions">
                         <div class="config-row">
-                            <label for="setting-dynamic">dynamic bg</label>
+                            <label for="setting-dynamic">Dynamic bg</label>
                             <input type="checkbox" id="setting-dynamic" />
                         </div>
                         <div class="config-row">
@@ -37,6 +37,7 @@
                         <div class="config-row config-row-buttons">
                             <button id="config-save">save</button>
                             <button id="config-load">load</button>
+                            <button id="config-info">info</button>
                         </div>
                     </div>
                 </div>
@@ -114,5 +115,49 @@
                 ></textarea>
             </section>
         </main>
+
+        <div id="info-overlay">
+            <div id="info-modal">
+                <button id="info-close"><img src="./assets/icons/close.svg" alt="Close" /></button>
+                <div id="info-content">
+                    <section class="info-section">
+                        <h3>To-Do List</h3>
+                        <ul>
+                            <li><kbd>Alt+click</kbd> on an item — edit it</li>
+                            <li class="info-sub"><kbd>Enter</kbd> or click outside — save</li>
+                            <li class="info-sub"><kbd>Esc</kbd> — abort edit</li>
+                            <li class="info-sub"><kbd>Delete</kbd> — delete item</li>
+                            <li><kbd>Ctrl+click</kbd> on an item — delete it</li>
+                            <li><kbd>▲</kbd> / <kbd>▼</kbd> — reorder items</li>
+                        </ul>
+                    </section>
+                    <section class="info-section">
+                        <h3>Bookmarks</h3>
+                        <ul>
+                            <li><kbd>Alt+click</kbd> on a slot — add / edit bookmark</li>
+                            <li class="info-sub"><kbd>Enter</kbd> or click outside — save</li>
+                            <li class="info-sub"><kbd>Esc</kbd> — abort edit</li>
+                            <li class="info-sub"><kbd>Delete</kbd> — delete bookmark</li>
+                            <li><kbd>click</kbd> — open link in this tab</li>
+                            <li><kbd>Ctrl+click</kbd> — open link in new tab</li>
+                        </ul>
+                    </section>
+                    <section class="info-section">
+                        <h3>Clipboard</h3>
+                        <ul>
+                            <li><kbd>Alt+click</kbd> on a slot — copy content to clipboard</li>
+                            <li><kbd>Ctrl+click</kbd> on a slot — clear slot</li>
+                        </ul>
+                    </section>
+                    <section class="info-section">
+                        <h3>Configuration</h3>
+                        <ul>
+                            <li><kbd>Ctrl+click</kbd> on the day/time tile — export config</li>
+                            <li><kbd>Alt+click</kbd> on the day/time tile — import config</li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

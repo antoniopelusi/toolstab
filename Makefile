@@ -1,4 +1,4 @@
-VERSION := "2.5"
+VERSION := "2.7"
 OUT_DIR := out
 
 .PHONY: firefox chrome clean run geticons

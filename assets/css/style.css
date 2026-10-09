@@ -42,7 +42,7 @@
     --color-900: #00000020;
 
     --box-shadow:       0 0 16px rgba(0, 0, 0, 0.15);
-    --box-shadow-hover: 0 0 32px rgba(0, 0, 0, 0.25);
+    --box-shadow-hover: 0 0 12px rgba(0, 0, 0, 0.22);
 }
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
@@ -79,11 +79,11 @@ body {
 }
 
 /* Interactive text in sections uses monospace; headings revert to sans */
-section * {
+main > section * {
     font-family: "Ubuntu Mono local", monospace;
 }
 
-section h2 {
+main section h2 {
     font-family: "Ubuntu local", sans-serif;
 }
 
@@ -98,7 +98,7 @@ main {
     gap: var(--spacing);
 }
 
-section {
+main > section {
     background-color: var(--color-tile);
     border-radius: var(--border-radius);
     padding: calc(var(--spacing) * 0.75);
@@ -109,20 +109,20 @@ section {
     transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-section:hover {
+main > section:hover {
     background-color: var(--color-tile-hover);
     box-shadow: var(--box-shadow-hover);
 }
 
-section:nth-child(1) { grid-row: 1; grid-column: 1 / 13;  }
-section:nth-child(2) { grid-row: 1; grid-column: 13 / 21; }
-section:nth-child(3) { grid-row: 2; grid-column: 1 / 8;   }
-section:nth-child(4) { grid-row: 2; grid-column: 8 / 13;  }
-section:nth-child(5) { grid-row: 2; grid-column: 13 / 21; }
+main > section:nth-child(1) { grid-row: 1; grid-column: 1 / 13;  }
+main > section:nth-child(2) { grid-row: 1; grid-column: 13 / 21; }
+main > section:nth-child(3) { grid-row: 2; grid-column: 1 / 8;   }
+main > section:nth-child(4) { grid-row: 2; grid-column: 8 / 13;  }
+main > section:nth-child(5) { grid-row: 2; grid-column: 13 / 21; }
 
 /* ── Shared section heading (sections 2–5) ───────────────────────────────── */
 
-section:nth-child(n+2) h2 {
+main > section:nth-child(n+2) h2 {
     font-size: var(--font-size-medium);
     font-weight: 700;
     color: var(--color-100);
@@ -133,7 +133,7 @@ section:nth-child(n+2) h2 {
 
 /* ── Section 1: Date / Time ───────────────────────────────────────────────── */
 
-section:nth-child(1) {
+main > section:nth-child(1) {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -143,17 +143,17 @@ section:nth-child(1) {
     cursor: pointer;
 }
 
-section:nth-child(1) * {
+main > section:nth-child(1) * {
     font-family: "Ubuntu local", sans-serif;
 }
 
-section:nth-child(1) > div {
+main > section:nth-child(1) > div {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-section:nth-child(1) > div:first-child { align-items: flex-start; }
+main > section:nth-child(1) > div:first-child { align-items: flex-start; }
 
 #time-wrapper {
     align-items: flex-end;
@@ -181,7 +181,7 @@ section:nth-child(1) > div:first-child { align-items: flex-start; }
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: calc(var(--spacing) * 0.2);
+    gap: calc(var(--spacing) * 0.65);
     z-index: 10;
 }
 
@@ -195,7 +195,7 @@ section:nth-child(1) > div:first-child { align-items: flex-start; }
     flex-shrink: 0;
 }
 
-section:nth-child(1):hover #config-trigger {
+main > section:nth-child(1):hover #config-trigger {
     opacity: 0.4;
 }
 
@@ -208,7 +208,7 @@ section:nth-child(1):hover #config-trigger {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: calc(var(--spacing) * 0.25);
+    gap: calc(var(--spacing) * 0.65);
     overflow: hidden;
     max-height: 0;
     opacity: 0;
@@ -217,7 +217,7 @@ section:nth-child(1):hover #config-trigger {
 }
 
 #config-menu.open #config-actions {
-    max-height: 16rem;
+    max-height: calc(var(--spacing) * 12);
     opacity: 1;
     pointer-events: auto;
 }
@@ -241,9 +241,9 @@ section:nth-child(1):hover #config-trigger {
 .config-row input[type="checkbox"] {
     appearance: none;
     flex-shrink: 0;
-    width: 26px;
-    height: 15px;
-    border-radius: 72px;
+    width: calc(var(--font-size-small) * 1.7);
+    height: calc(var(--font-size-small) * 1.0);
+    border-radius: calc(var(--font-size-small) * 2);
     background-color: var(--color-500);
     position: relative;
     cursor: pointer;
@@ -255,12 +255,12 @@ section:nth-child(1):hover #config-trigger {
 .config-row input[type="checkbox"]::after {
     content: "";
     position: absolute;
-    width: 11px;
-    height: 11px;
+    width: calc(var(--font-size-small) * 0.7);
+    height: calc(var(--font-size-small) * 0.7);
     border-radius: 50%;
     background-color: var(--color-100);
-    top: 2px;
-    left: 2px;
+    top: calc(var(--font-size-small) * 0.15);
+    left: calc(var(--font-size-small) * 0.15);
     transition: left 0.15s ease;
 }
 
@@ -269,7 +269,7 @@ section:nth-child(1):hover #config-trigger {
 }
 
 .config-row input[type="checkbox"]:checked::after {
-    left: 13px;
+    left: calc(var(--font-size-small) * 0.85);
 }
 
 .config-row input[type="text"] {
@@ -279,7 +279,8 @@ section:nth-child(1):hover #config-trigger {
     color: var(--color-300);
     font-size: calc(var(--font-size-small) * 0.85);
     font-family: "Ubuntu Mono local", monospace;
-    width: 5.5rem;
+    width: 0;
+    flex: 1;
     padding: 0;
     outline: none;
     text-align: right;
@@ -325,14 +326,14 @@ section:nth-child(1):hover #config-trigger {
 
 /* ── Section 2: To-Do ────────────────────────────────────────────────────── */
 
-section:nth-child(2) {
+main > section:nth-child(2) {
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
 /* Clear-completed icon */
-section:nth-child(2) img#clear-completed {
+main > section:nth-child(2) img#clear-completed {
     position: absolute;
     top: calc(var(--spacing) * 0.75);
     right: calc(var(--spacing) * 0.75);
@@ -344,16 +345,16 @@ section:nth-child(2) img#clear-completed {
     transition: opacity 0.15s ease;
 }
 
-section:nth-child(2):hover img#clear-completed {
+main > section:nth-child(2):hover img#clear-completed {
     opacity: 0.4;
 }
 
-section:nth-child(2) img#clear-completed:hover {
+main > section:nth-child(2) img#clear-completed:hover {
     opacity: 0.8;
 }
 
 /* Task list */
-section:nth-child(2) ul {
+main > section:nth-child(2) ul {
     flex: 1;
     list-style: none;
     overflow-y: auto;
@@ -362,7 +363,7 @@ section:nth-child(2) ul {
     margin-bottom: calc(var(--spacing) * 0.5);
 }
 
-section:nth-child(2) li {
+main > section:nth-child(2) li {
     display: flex;
     align-items: flex-start;
     gap: calc(var(--spacing) * 0.4);
@@ -370,7 +371,7 @@ section:nth-child(2) li {
 }
 
 /* Bullet: real element for reliable click targeting */
-section:nth-child(2) li .todo-bullet {
+main > section:nth-child(2) li .todo-bullet {
     flex-shrink: 0;
     width: var(--font-size-small);
     height: var(--font-size-small);
@@ -383,11 +384,11 @@ section:nth-child(2) li .todo-bullet {
     display: block;
 }
 
-section:nth-child(2) li.completed .todo-bullet {
+main > section:nth-child(2) li.completed .todo-bullet {
     background-color: var(--color-500);
 }
 
-section:nth-child(2) li .todo-text {
+main > section:nth-child(2) li .todo-text {
     flex: 1;
     min-width: 0;
     color: var(--color-300);
@@ -396,13 +397,13 @@ section:nth-child(2) li .todo-text {
     word-break: break-word;
 }
 
-section:nth-child(2) li.completed .todo-text {
+main > section:nth-child(2) li.completed .todo-text {
     text-decoration: line-through;
     opacity: 0.6;
 }
 
 /* Inline edit input */
-section:nth-child(2) li input[type="text"] {
+main > section:nth-child(2) li input[type="text"] {
     flex: 1;
     min-width: 0;
     background: transparent;
@@ -415,13 +416,13 @@ section:nth-child(2) li input[type="text"] {
 }
 
 /* Reorder arrows */
-section:nth-child(2) li .todo-arrows {
+main > section:nth-child(2) li .todo-arrows {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
 }
 
-section:nth-child(2) li .todo-arrows button {
+main > section:nth-child(2) li .todo-arrows button {
     background: none;
     border: none;
     padding: 0;
@@ -431,13 +432,13 @@ section:nth-child(2) li .todo-arrows button {
     cursor: pointer;
 }
 
-section:nth-child(2) li .todo-arrows button:disabled {
+main > section:nth-child(2) li .todo-arrows button:disabled {
     opacity: 0.25;
     cursor: default;
 }
 
 /* Add-task input */
-section:nth-child(2) input#todo-input {
+main > section:nth-child(2) input#todo-input {
     flex-shrink: 0;
     width: 100%;
     background-color: var(--color-900);
@@ -451,19 +452,19 @@ section:nth-child(2) input#todo-input {
     text-align: center;
 }
 
-section:nth-child(2) input#todo-input::placeholder {
+main > section:nth-child(2) input#todo-input::placeholder {
     color: var(--color-300);
     opacity: 0.5;
 }
 
 /* ── Section 3: Bookmarks ─────────────────────────────────────────────────── */
 
-section:nth-child(3) {
+main > section:nth-child(3) {
     display: flex;
     flex-direction: column;
 }
 
-section:nth-child(3) #bookmarks-grid {
+main > section:nth-child(3) #bookmarks-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: calc(var(--spacing) * 3);
@@ -474,8 +475,8 @@ section:nth-child(3) #bookmarks-grid {
     align-content: start;
 }
 
-section:nth-child(3) #bookmarks-grid > div,
-section:nth-child(3) #bookmarks-grid > a {
+main > section:nth-child(3) #bookmarks-grid > div,
+main > section:nth-child(3) #bookmarks-grid > a {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -488,8 +489,8 @@ section:nth-child(3) #bookmarks-grid > a {
     cursor: pointer;
 }
 
-section:nth-child(3) #bookmarks-grid > div:hover,
-section:nth-child(3) #bookmarks-grid > a:hover {
+main > section:nth-child(3) #bookmarks-grid > div:hover,
+main > section:nth-child(3) #bookmarks-grid > a:hover {
     background-color: var(--color-800);
 }
 
@@ -501,23 +502,23 @@ section:nth-child(3) #bookmarks-grid > a:hover {
     pointer-events: none;
 }
 
-section:nth-child(3):hover .bookmark-empty {
+main > section:nth-child(3):hover .bookmark-empty {
     background-color: var(--color-800);
 }
 
-section:nth-child(3):hover .bookmark-empty .bookmark-empty-icon {
+main > section:nth-child(3):hover .bookmark-empty .bookmark-empty-icon {
     opacity: 0.2;
 }
 
-section:nth-child(3) .bookmark-empty:hover {
+main > section:nth-child(3) .bookmark-empty:hover {
     background-color: var(--color-900) !important;
 }
 
-section:nth-child(3) .bookmark-empty:hover .bookmark-empty-icon {
+main > section:nth-child(3) .bookmark-empty:hover .bookmark-empty-icon {
     opacity: 1;
 }
 
-section:nth-child(3) .bookmark-inner {
+main > section:nth-child(3) .bookmark-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -528,15 +529,15 @@ section:nth-child(3) .bookmark-inner {
     padding: calc(var(--spacing) * 0.15);
 }
 
-section:nth-child(3) .bookmark-inner svg,
-section:nth-child(3) .bookmark-inner img {
+main > section:nth-child(3) .bookmark-inner svg,
+main > section:nth-child(3) .bookmark-inner img {
     width: calc(var(--font-size-small) * 1.6);
     height: calc(var(--font-size-small) * 1.6);
     flex-shrink: 0;
     display: block;
 }
 
-section:nth-child(3) .bookmark-inner span {
+main > section:nth-child(3) .bookmark-inner span {
     font-size: calc(var(--font-size-small) * 0.85);
     line-height: 1.2;
     white-space: nowrap;
@@ -548,7 +549,7 @@ section:nth-child(3) .bookmark-inner span {
 }
 
 /* Edit form inside a bookmark cell */
-section:nth-child(3) .bookmark-edit {
+main > section:nth-child(3) .bookmark-edit {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -559,7 +560,7 @@ section:nth-child(3) .bookmark-edit {
     padding: calc(var(--spacing) * 0.15);
 }
 
-section:nth-child(3) .bookmark-edit input {
+main > section:nth-child(3) .bookmark-edit input {
     width: 100%;
     min-width: 0;
     background-color: var(--color-900);
@@ -573,22 +574,22 @@ section:nth-child(3) .bookmark-edit input {
     text-align: center;
 }
 
-section:nth-child(3) .bookmark-edit input::placeholder {
+main > section:nth-child(3) .bookmark-edit input::placeholder {
     color: var(--color-500);
 }
 
-section:nth-child(3) .bookmark-edit input:focus {
+main > section:nth-child(3) .bookmark-edit input:focus {
     background-color: var(--color-700);
 }
 
 /* ── Section 4: Clipboard ─────────────────────────────────────────────────── */
 
-section:nth-child(4) {
+main > section:nth-child(4) {
     display: flex;
     flex-direction: column;
 }
 
-section:nth-child(4) > div {
+main > section:nth-child(4) > div {
     display: flex;
     flex-direction: column;
     gap: calc(var(--spacing) * 0.25);
@@ -596,7 +597,7 @@ section:nth-child(4) > div {
     min-height: 0;
 }
 
-section:nth-child(4) textarea {
+main > section:nth-child(4) textarea {
     flex: 1;
     min-height: 0;
     background-color: transparent;
@@ -613,23 +614,23 @@ section:nth-child(4) textarea {
     transition: background-color 0.15s ease;
 }
 
-section:nth-child(4) textarea.has-content {
+main > section:nth-child(4) textarea.has-content {
     background-color: var(--color-900);
     border-bottom-color: var(--color-700);
 }
 
-section:nth-child(4) textarea:hover {
+main > section:nth-child(4) textarea:hover {
     background-color: var(--color-800);
 }
 
 /* ── Section 5: Notepad ───────────────────────────────────────────────────── */
 
-section:nth-child(5) {
+main > section:nth-child(5) {
     display: flex;
     flex-direction: column;
 }
 
-section:nth-child(5) textarea {
+main > section:nth-child(5) textarea {
     flex: 1;
     min-height: 0;
     background-color: transparent;
@@ -642,4 +643,119 @@ section:nth-child(5) textarea {
     outline: none;
     resize: none;
     line-height: 1.5;
+}
+
+/* ── Info modal ───────────────────────────────────────────────────────────── */
+
+#info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+#info-overlay.open {
+    display: flex;
+}
+
+#info-modal {
+    position: relative;
+    background-color: var(--color-background);
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing) * 1.2) calc(var(--spacing) * 1.4);
+    max-width: clamp(300px, 50vmin, 480px);
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--box-shadow-hover);
+}
+
+#info-close {
+    position: absolute;
+    top: calc(var(--spacing) * 0.5);
+    right: calc(var(--spacing) * 0.6);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+
+#info-close img {
+    display: block;
+    width: var(--font-size-medium);
+    height: var(--font-size-medium);
+}
+
+#info-close:hover {
+    opacity: 1;
+}
+
+#info-content {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.9);
+}
+
+.info-section {
+    background-color: var(--color-tile);
+    border-radius: calc(var(--border-radius) * 0.75);
+    padding: calc(var(--spacing) * 0.6) calc(var(--spacing) * 0.8);
+}
+
+.info-section h3 {
+    font-family: "Ubuntu local", sans-serif;
+    font-size: var(--font-size-medium);
+    font-weight: 700;
+    color: var(--color-300);
+    margin: 0 0 calc(var(--spacing) * 0.35) 0;
+}
+
+.info-section ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.2);
+}
+
+.info-section li {
+    font-family: "Ubuntu Mono local", monospace;
+    font-size: var(--font-size-small);
+    color: var(--color-300);
+    line-height: 1.4;
+    padding-left: calc(var(--spacing) * 0.8);
+    position: relative;
+}
+
+.info-section li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: var(--color-500);
+}
+
+.info-section li.info-sub {
+    padding-left: calc(var(--spacing) * 1.6);
+    color: var(--color-500);
+}
+
+.info-section li.info-sub::before {
+    left: calc(var(--spacing) * 0.8);
+}
+
+.info-section kbd {
+    font-family: "Ubuntu Mono local", monospace;
+    font-size: calc(var(--font-size-small) * 0.9);
+    background-color: var(--color-900);
+    border: 1px solid var(--color-700);
+    border-radius: calc(var(--border-radius) * 0.25);
+    padding: 0.05em 0.35em;
+    color: var(--color-100);
 }

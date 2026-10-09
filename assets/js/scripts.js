@@ -808,6 +808,22 @@ class ImportExport {
     }
 }
 
+// ─── Info modal ───────────────────────────────────────────────────────────────
+function initInfoModal() {
+    const overlay = document.getElementById("info-overlay");
+    const trigger = document.getElementById("config-info");
+    const closeBtn = document.getElementById("info-close");
+    const modal   = document.getElementById("info-modal");
+
+    function open()  { overlay.classList.add("open"); }
+    function close() { overlay.classList.remove("open"); }
+
+    trigger.addEventListener("click", open);
+    closeBtn.addEventListener("click", close);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && overlay.classList.contains("open")) close(); });
+}
+
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 async function main() {
     await initializeStorage();
@@ -819,6 +835,7 @@ async function main() {
     new Clipboard().init();
     new Notepad().init();
     ImportExport.init(dateTime);
+    initInfoModal();
 
     document.addEventListener("keydown", (e) => {
         if (

@@ -410,10 +410,11 @@ class Bookmarks {
         fetch(iconSrc)
             .then((r) => r.text())
             .then((svgText) => {
-                const tmp = document.createElement("div");
-                tmp.innerHTML = svgText;
-                const svg = tmp.querySelector("svg");
-                if (svg) {
+                const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+                const parsed = doc.documentElement;
+                if (parsed && parsed.localName === "svg" && !doc.querySelector("parsererror")) {
+                    parsed.querySelectorAll("script").forEach((s) => s.remove());
+                    const svg = document.importNode(parsed, true);
                     svg.setAttribute("fill", iconColor);
                     inner.appendChild(svg);
                 } else {

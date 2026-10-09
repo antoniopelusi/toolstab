@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ToolsTab",
-    "version": "2.7",
+    "version": "2.8",
     "description": "Minimal and responsive browser startpage with useful tools.",
     "chrome_url_overrides": {
         "newtab": "index.html"
@@ -14,7 +14,10 @@
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "antoniopelusi2000@gmail.com"
+            "id": "antoniopelusi2000@gmail.com",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
         }
     }
 }
